@@ -3,7 +3,9 @@ var WorldGravity = 15;
 var resolution = 2.2;
 var scale = 60000/Math.min(window.innerWidth,window.innerHeight);
 scale/=10;
+var mouse = new Vec2();
 var clock = new Clock();
+var down = false;
 clock.add('t1',2);
 b2PolygonShape.prototype.draw = function(t){
 	t.beginShape();
@@ -221,15 +223,26 @@ function addCircularBody(x=0,y=0,f,d,r=100/scale,a=0,c){
 	body.CreateFixtureFromDef(fd);
 }
 function getMouse(event){
-	var x = (event.offsetX*resolution-ww/2)/tool.scl;
-	var y = (event.offsetY*resolution-hh/2)/tool.scl;
-	return new b2Vec2(x,y);
+	var x = (event.offsetX*resolution-tool.pos.x)/tool.scl;
+	var y = (event.offsetY*resolution-tool.pos.y)/tool.scl;
+	return new Vec2(x,y);
 }
 addChainShape([new b2Vec2(-10,-10),new b2Vec2(0,0),new b2Vec2(40,-10),new b2Vec2(60,-25),new b2Vec2(120,-25),new b2Vec2(200,0),]);
 window.addEventListener('mousedown',function(event){
+	mouse = getMouse(event);
+	down = true;
+},false);
+window.addEventListener('mousemove',function(event){
 	var p = getMouse(event);
-	if(rr)addCircularBody(p.x,p.y,0.3,1,10,10);
-	else addCircularGroup(p.x,p.y,2);
+	if(down){
+		var d = mouse.clone().sub(p);
+		tool.pos.sub(d.scl(tool.scl));
+	}
+	p = getMouse(event);
+	mouse = p;
+},false);
+window.addEventListener('mouseup',function(event){
+	down = false;
 },false);
 function Step(){
 	world.Step(1/60,8,3);
@@ -268,29 +281,25 @@ title.size = 30;
 title.strokedText = true;
 title.ls = 0.2;
 var keys = [];
-var rr = true;
 window.addEventListener('keydown', function(e){keys[e.key] = true;}, false);
 window.addEventListener('keyup', function(e){keys[e.key] = false;}, false);
 function run(){
 	tool.fill(235);
-	tool.rectMode('center');
+	tool.rectMode('corner');
 	tool.noStroke();
-	tool.rect(0,0,(ww+2)/scale,(hh+2)/scale);
-	//title.draw(tool);
+	tool.rect(-tool.pos.x/scale,-tool.pos.y/scale,ww/scale,hh/scale);
+	title.draw(tool);
 	Step();
 	draw();
+	if(keys['q']){
+		addCircularGroup(mouse.x,mouse.y,0.4);
+	}
 	if(keys['x']){
-		tool.scl/=1.005;
+		tool.scl/=1.05;
 		scale = tool.scl;
 	}
-	if(keys['q']){
-		rr = false;
-	}
-	if(keys['w']){
-		rr = true;
-	}
 	if(keys['z']){
-		tool.scl*=1.005;
+		tool.scl*=1.05;
 		scale = tool.scl;
 	}
 	if(clock.is('t1') && clock.getTime()<25){
