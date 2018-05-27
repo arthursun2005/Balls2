@@ -1,12 +1,13 @@
 var ParticleRadius = 0.18;
-var WorldGravity = 15;
+var WorldGravity = 16;
 var resolution = 2.2;
 var scale = 60000/Math.min(window.innerWidth,window.innerHeight);
 scale/=10;
 var mouse = new Vec2();
 var clock = new Clock();
 var down = false;
-clock.add('t1',2);
+clock.add('t1',3);
+clock.add('t2',1);
 b2PolygonShape.prototype.draw = function(t){
 	t.beginShape();
 	for (var k = this.vertices.length - 1; k >= 0; k--) {
@@ -226,7 +227,9 @@ function getMouse(event){
 	var y = (event.offsetY*resolution-tool.center.y)/tool.scl-tool.pos.y;
 	return new Vec2(x,y);
 }
-addChainShape([new b2Vec2(-10,-10),new b2Vec2(0,0),new b2Vec2(40,-10),new b2Vec2(60,-25),new b2Vec2(120,-25),new b2Vec2(200,0),]);
+addChainShape([new b2Vec2(-10,-10),new b2Vec2(0,0),new b2Vec2(40,-10),new b2Vec2(60,-25),new b2Vec2(120,-25),new b2Vec2(200,0),new b2Vec2(250,10),new b2Vec2(250,9.2)]);
+addChainShape([new b2Vec2(-30,-10),new b2Vec2(-30,20),new b2Vec2(400,20),new b2Vec2(400,-10)]);
+addChainShape([new b2Vec2(0,20),new b2Vec2(0,0)]);
 window.addEventListener('mousedown',function(event){
 	mouse = getMouse(event);
 	down = true;
@@ -280,7 +283,10 @@ title.size = 30;
 title.strokedText = true;
 title.ls = 0.2;
 var keys = [];
-window.addEventListener('keydown', function(e){keys[e.key] = true;}, false);
+window.addEventListener('keydown', function(e){
+	keys[e.key] = true;
+	if(e.key == 'q')addRectBody(mouse.x,mouse.y,0,3,3,3,0,0.1);
+}, false);
 window.addEventListener('keyup', function(e){keys[e.key] = false;}, false);
 function run(){
 	tool.fill(235);
@@ -290,7 +296,7 @@ function run(){
 	title.draw(tool);
 	Step();
 	draw();
-	if(keys['q']){
+	if(keys['w']){
 		addCircularGroup(mouse.x,mouse.y,0.4);
 	}
 	if(keys['x']){
@@ -305,8 +311,8 @@ function run(){
 		var bd = new b2BoxDef();
 		bd.position.Set(10,-10);
 		var box = world.CreateBox(bd);
-		box.setSpeed(16);
-		addRectBody(10,-11,1,1,2,1);
+		box.setSpeed(20);
+		addRectBody(10,-11.5,0,0.4,2.5,1.5);
 	}
 	requestAnimationFrame(run);
 }
