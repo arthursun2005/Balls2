@@ -154,10 +154,9 @@ var ww = window.innerWidth*resolution, hh = window.innerHeight*resolution;
 function init(){
 	c1.width = ww, c1.height = hh;
 	c1.style.width = ww/resolution+"px", c1.style.height = hh/resolution+"px";
-	c1.style.border = "0.6px #000 solid";
 	tool = new Draw(c1);
-	tool.pos.set(ww/2,hh/2);
 	tool.scl = scale;
+	tool.center.set(ww/2,hh/2);
 }
 var psd = new b2ParticleSystemDef();
 var pgd = new b2ParticleGroupDef();
@@ -223,8 +222,8 @@ function addCircularBody(x=0,y=0,f,d,r=100/scale,a=0,c){
 	body.CreateFixtureFromDef(fd);
 }
 function getMouse(event){
-	var x = (event.offsetX*resolution-tool.pos.x)/tool.scl;
-	var y = (event.offsetY*resolution-tool.pos.y)/tool.scl;
+	var x = (event.offsetX*resolution-tool.center.x)/tool.scl-tool.pos.x;
+	var y = (event.offsetY*resolution-tool.center.y)/tool.scl-tool.pos.y;
 	return new Vec2(x,y);
 }
 addChainShape([new b2Vec2(-10,-10),new b2Vec2(0,0),new b2Vec2(40,-10),new b2Vec2(60,-25),new b2Vec2(120,-25),new b2Vec2(200,0),]);
@@ -236,7 +235,7 @@ window.addEventListener('mousemove',function(event){
 	var p = getMouse(event);
 	if(down){
 		var d = mouse.clone().sub(p);
-		tool.pos.sub(d.scl(tool.scl));
+		tool.pos.sub(d);
 	}
 	p = getMouse(event);
 	mouse = p;
@@ -273,7 +272,7 @@ function draw(){
 }
 window.addEventListener('resize',function(){
 	ww = window.innerWidth*resolution, hh = window.innerHeight*resolution;
-	tool.pos.set(ww/2,hh/2);
+	tool.center.set(ww/2,hh/2);
 	draw();
 }, false);
 var title = new Text("Balls",0,-50);
@@ -287,7 +286,7 @@ function run(){
 	tool.fill(235);
 	tool.rectMode('corner');
 	tool.noStroke();
-	tool.rect(-tool.pos.x/scale,-tool.pos.y/scale,ww/scale,hh/scale);
+	tool.rect(-tool.center.x/scale-tool.pos.x,-tool.center.y/scale-tool.pos.y,ww/scale,hh/scale);
 	title.draw(tool);
 	Step();
 	draw();
