@@ -282,6 +282,13 @@ var title = new Text("Balls",0,-50);
 title.size = 30;
 title.strokedText = true;
 title.ls = 0.2;
+
+var fl = new Text("Finish",360,-30);
+fl.size = 20;
+fl.strokedText = false;
+fl.ls = 0.2;
+fl.fillColor.set(0,255,0);
+
 var keys = [];
 window.addEventListener('keydown', function(e){
 	keys[e.key] = true;
@@ -294,6 +301,7 @@ function run(){
 	tool.noStroke();
 	tool.rect(-tool.center.x/scale-tool.pos.x,-tool.center.y/scale-tool.pos.y,ww/scale,hh/scale);
 	title.draw(tool);
+	fl.draw(tool);
 	Step();
 	draw();
 	if(keys['w']){
@@ -307,7 +315,7 @@ function run(){
 		tool.scl*=1.05;
 		scale = tool.scl;
 	}
-	if(clock.is('t1') && clock.getTime()<25){
+	if(clock.is('t1') && clock.getTime()<30){
 		var bd = new b2BoxDef();
 		bd.position.Set(10,-10);
 		var box = world.CreateBox(bd);
